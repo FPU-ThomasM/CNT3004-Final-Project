@@ -21,7 +21,17 @@ def files_Set(directory):
     
     return filesSet
         
-        
+def sendFiles(conn, fileName: Path()):
+    """Send file to client"""
+    with open(fileName, 'rb') as file:
+        while True:
+            print("Sending...")
+            file_content = file.read(SIZE)
+            if not file_content:
+                break
+            conn.sendall(file_content)
+
+    conn.send(b"END")
 
 
 ### to handle the clients
@@ -59,15 +69,7 @@ def handle_client (conn,addr):
         # TODO Allow for fileName to be inputed by user
         elif cmd == "DOWNLOAD":
             fileName = Path(q.parent / "downloadable-storage/25mb-text-file.txt")
-            with open(fileName, 'rb') as file:
-                while True:
-                    print("Sending...")
-                    file_content = file.read(SIZE)
-                    if not file_content:
-                        break
-                    conn.sendall(file_content)
-
-            conn.send(b"END")
+            sendFiles(conn, fileName)
             send_data += "Message from the server.\n"
             conn.send(send_data.encode(FORMAT))
             print("Completed task")
