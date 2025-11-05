@@ -15,7 +15,18 @@ SERVER_DATA_PATH = "server_data"
 
     
 
-
+def downloadFile(client, savedName):
+    """Recieve file from server and save"""
+    with open(f"{savedName}", 'wb') as file:
+        while True:
+            print("Receiving...")
+            data = client.recv(SIZE)
+            if data == b"END":
+                break
+            file.write(data)
+                    
+    print("completed task")
+    pass
 
 def main():
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -48,15 +59,7 @@ def main():
         # TODO Have user input which file they want to download (will probably be done with UI stuff idk I just needed this to test my code)
         elif cmd == "DOWNLOAD":
             client.send(cmd.encode(FORMAT))
-            with open("test.txt", 'wb') as file:
-                while True:
-                    print("Receiving...")
-                    data = client.recv(SIZE)
-                    if data == b"END":
-                        break
-                    file.write(data)
-                    
-                print("completed task")
+            downloadFile(client, "test.txt")
 
 
             
