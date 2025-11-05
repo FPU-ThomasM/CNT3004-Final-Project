@@ -1,5 +1,3 @@
-# Author : Ayesha S. Dina
-# Modified by: Denis Ulybyshev
 import os
 import socket
 import json
