@@ -1,6 +1,7 @@
 import os
 import socket
 import json
+import hashlib #added for hashing
 from pathlib import Path
 
 
@@ -45,12 +46,62 @@ def sendFiles(conn, fileName: Path()):
 
 
 
+def authenticate(client):
+    """send username + hashed password to server then wait for approval."""
+    username = input("Username: ")
+    password = input("Password: ")
+
+    #hash password (no plaintext over network)
+    salt = "CNT3004"
+    hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
+
+    #send authentication package
+    auth_msg = f"AUTH@{username}@{hashed_pw}"
+    client.send(auth_msg.encode(FORMAT))
+
+    #wait for server response
+    response = client.recv(SIZE).decode(FORMAT)
+
+    if response == "AUTH_OK":
+        print("Authentication successful!\n")
+        return True
+    else:
+        print("Authentication failed. Disconnecting.")
+        return False
+
+def authenticate(client):
+    """send username + hashed password to server then wait for approval."""
+    username = input("Username: ")
+    password = input("Password: ")
+
+    #hash password (no plaintext over network)
+    salt = "CNT3004"
+    hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
+
+    #send authentication package
+    auth_msg = f"AUTH@{username}@{hashed_pw}"
+    client.send(auth_msg.encode(FORMAT))
+
+    #wait for server response
+    response = client.recv(SIZE).decode(FORMAT)
+
+    if response == "AUTH_OK":
+        print("Authentication successful!\n")
+        return True
+    else:
+        print("Authentication failed. Disconnecting.")
+        return False
+
 def main():
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client.connect(ADDR)
     client.send('hello world CNT 3004 \n'.encode())
-    
-    
+
+    #authentication step
+    if not authenticate(client):
+        client.close()
+        return
+
     while True: ### multiple communications
         data = client.recv(SIZE).decode(FORMAT)
         cmd, msg = data.split("@")
