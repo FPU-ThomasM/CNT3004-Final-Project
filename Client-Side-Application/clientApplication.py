@@ -1,6 +1,8 @@
 import os
 import socket
 import json
+from pathlib import Path
+
 
 # IP = "192.168.1.101" #"localhost"
 IP = "localhost"
@@ -10,11 +12,9 @@ SIZE = 1024 ## byte .. buffer size
 FORMAT = "utf-8"
 SERVER_DATA_PATH = "server_data"
 
-
-    
-
-def downloadFile(client, savedName):
+def downloadFile(client):
     """Recieve file from server and save"""
+    savedName = client.recv(SIZE).decode(FORMAT)
     with open(f"{savedName}", 'wb') as file:
         while True:
             print("Receiving...")
@@ -22,9 +22,28 @@ def downloadFile(client, savedName):
             if data == b"END":
                 break
             file.write(data)
+            #Like this doesn't need to say anything lol just exists to make sure b"END" is sent as its own lol
+            client.send("NEXT".encode(FORMAT))
                     
     print("completed task")
     pass
+    
+def sendFiles(conn, fileName: Path()):
+    """Send file to client"""
+    with open(fileName, 'rb') as file:
+        while True:
+            print("Sending...") 
+            file_content = file.read(SIZE)
+            if not file_content:
+                break
+            conn.sendall(file_content)
+            conn.recv(SIZE).decode(FORMAT)
+    conn.send(b"END")
+    print(b"END")
+    print("File sent")
+    pass
+
+
 
 def main():
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -42,8 +61,9 @@ def main():
             print(f"{msg}")
             break
         data = input("> ")
-        data = data.split(" ")
-        cmd = data[0]
+        cmd = data
+        print(cmd)
+        p = Path()
         
         if cmd == "TASK":
             client.send(cmd.encode(FORMAT))
@@ -51,19 +71,38 @@ def main():
         elif cmd == "LOGOUT":
             client.send(cmd.encode(FORMAT))
             break
-        elif cmd == "FILES":
+        
+        elif cmd == "Dir":
             client.send(cmd.encode(FORMAT))
         
-        # TODO Have user input which file they want to download (will probably be done with UI stuff idk I just needed this to test my code)
-        elif cmd == "DOWNLOAD":
+        elif "Upload " in cmd:
             client.send(cmd.encode(FORMAT))
-            downloadFile(client, "test.txt")
+            filePath = cmd.replace("Upload ",'',1)
+            filePath = Path(filePath)
+            print(filePath.name)
+            client.send(filePath.name.encode(FORMAT))
+            if client.recv(SIZE).decode(FORMAT) == "Error":
+                response = input("File already exists, should it be replaced (y/n): ")
+                if response.lower() == 'y':
+                    client.send(b"OK")
+                    sendFiles(client, filePath)
+                else:
+                    client.send(b"NO")
+            else:
+                sendFiles(client, filePath)
+            
+
+            
+
+
+
+        elif "Download " in cmd:
+            client.send(cmd.encode(FORMAT))
+            downloadFile(client)
+           
 
 
             
-            
-
-        
     print("Disconnected from the server.")
     client.shutdown(socket.SHUT_WR)
     client.close() ## close the connection
