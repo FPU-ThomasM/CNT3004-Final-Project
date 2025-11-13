@@ -69,28 +69,6 @@ def authenticate(client):
         print("Authentication failed. Disconnecting.")
         return False
 
-def authenticate(client):
-    """send username + hashed password to server then wait for approval."""
-    username = input("Username: ")
-    password = input("Password: ")
-
-    #hash password (no plaintext over network)
-    salt = "CNT3004"
-    hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
-
-    #send authentication package
-    auth_msg = f"AUTH@{username}@{hashed_pw}"
-    client.send(auth_msg.encode(FORMAT))
-
-    #wait for server response
-    response = client.recv(SIZE).decode(FORMAT)
-
-    if response == "AUTH_OK":
-        print("Authentication successful!\n")
-        return True
-    else:
-        print("Authentication failed. Disconnecting.")
-        return False
 
 def main():
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
