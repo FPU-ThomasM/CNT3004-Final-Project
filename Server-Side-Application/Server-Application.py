@@ -3,6 +3,7 @@ import socket
 import threading
 from pathlib import Path
 import json
+import hashlib #added for authentication
  
 IP = "localhost"
 PORT = 4450
@@ -11,6 +12,12 @@ SIZE = 1024
 FORMAT = "utf-8"
 SERVER_PATH = "server"
 currDir = "downloadable-storage" #Current directory
+
+SALT = "CNT3004" #matches client
+USER_DATABASE = {
+    "user1": hashlib.sha256(("password123" + SALT).encode()).hexdigest(),
+    "abbey": hashlib.sha256(("mypassword" + SALT).encode()).hexdigest(),
+}
 
 def files_Set(directory):
     """Take a directory and return a set of all files within the directory"""
@@ -94,6 +101,29 @@ def dirDelete(path):
 def handle_client (conn,addr):
     print(f"[NEW CONNECTION] {addr} connected.")
     conn.send("OK@Welcome to the CNT 3004 server - Python".encode(FORMAT))
+
+#authentication block
+    authenticated = False
+
+    while not authenticated:
+        auth_data = conn.recv(SIZE).decode(FORMAT)
+
+        if not auth_data.startswith("AUTH"):
+            conn.send("AUTH_FAIL".encode(FORMAT))
+            continue
+
+        _, username, password_hash = auth_data.split("@")
+
+        if username in USER_DATABASE and USER_DATABASE[username] == password_hash:
+            conn.send("AUTH_OK".encode(FORMAT))
+            print(f"[AUTH SUCCESS] {username} authenticated.")
+            authenticated = True
+        else:
+            conn.send("AUTH_FAIL".encode(FORMAT))
+            print(f"[AUTH FAILED] {addr}")
+            conn.close()
+            return
+ 
     while True:
         data =  conn.recv(SIZE).decode(FORMAT)
         data = data.split("@")
