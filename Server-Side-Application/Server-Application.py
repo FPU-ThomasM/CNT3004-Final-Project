@@ -10,6 +10,7 @@ ADDR = (IP,PORT)
 SIZE = 1024
 FORMAT = "utf-8"
 SERVER_PATH = "server"
+currDir = "downloadable-storage" #Current directory
 
 def files_Set(directory):
     """Take a directory and return a set of all files within the directory"""
@@ -39,8 +40,8 @@ def sendFiles(conn, fileName: Path()):
 
 def downloadFile(client):
     """Recieve file from client and save"""
-    #Set the files name so that it will be saved in downloadable-storage
-    folderPath = Path("downloadable-storage")
+    #Set the files name so that it will be saved in current directory
+    folderPath = Path(currDir)
     savedName = client.recv(SIZE).decode(FORMAT)
     savedNamePath = Path(savedName)
     savedNamePath = Path(folderPath / savedNamePath.name)
@@ -103,6 +104,8 @@ def handle_client (conn,addr):
        
         send_data = "OK@"
 
+        
+
         if cmd == "LOGOUT":
             break
 
@@ -115,7 +118,7 @@ def handle_client (conn,addr):
         
         # Print list of files in the downloadable storage folder
         elif cmd == "Dir":
-            folder = Path(q.parent / "downloadable-storage")
+            folder = Path(q.parent / currDir)
             print(f"{send_data}")
             #send_data += "LOGOUT from the server.\n"
             setofFIles = files_Set(folder)
@@ -132,7 +135,7 @@ def handle_client (conn,addr):
             fileName = cmd.replace("Download ",'',1)
             print("Recieved")
             try:
-                fileNamePath = Path(q.parent / f"downloadable-storage/{fileName}")
+                fileNamePath = Path(q.parent / f"{currDir}/{fileName}")
             except FileNotFoundError as e:
                 print("Error: File Not Found")
                 send_data += "Error: File Not Found"
@@ -145,7 +148,7 @@ def handle_client (conn,addr):
 
         elif "DirCreate" in cmd:
             dirName = cmd.replace("DirCreate ",'',1)
-            path = Path(q.parent / f"downloadable-storage/{dirName}")
+            path = Path(q.parent / f"{currDir}/{dirName}")
             try:
                 path.mkdir(exist_ok = False, parents = True)
                 send_data += f"Directory /{dirName} Created\n"
@@ -155,7 +158,7 @@ def handle_client (conn,addr):
 
         elif "DirDelete" in cmd:
             dirName = cmd.replace("DirDelete ",'',1)
-            path = Path(q.parent / f"downloadable-storage/{dirName}")
+            path = Path(q.parent / f"{currDir}/{dirName}")
             if not path.exists():
                 send_data += "path does not exist\n"
             elif not path.is_dir():
@@ -168,9 +171,20 @@ def handle_client (conn,addr):
                     send_data += "Directory could not be deleted\n"
             conn.send(send_data.encode(FORMAT))
 
+        #Change the current Directory
+        elif "ChangeDir " in cmd:
+            newDir = cmd.replace("ChangeDir ",'',1)
+            newDirPath = Path(newDir)
+            if newDirPath.is_dir(): #Check if the user specified directory exists
+                currDir = newDir
+                send_data += f"Changed directory to {currDir}\n"
+            else:
+                send_data += "Directory does not exist\n"
+            conn.send(send_data.encode(FORMAT))
+
         elif "Delete " in cmd:
             fileName = cmd.replace("Delete ",'',1)
-            file_path = Path(q.parent / f"downloadable-storage/{fileName}")
+            file_path = Path(q.parent / f"{currDir}/{fileName}")
             if file_path.exists():
                 try:
                     file_path.unlink()
