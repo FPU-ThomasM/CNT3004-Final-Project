@@ -132,6 +132,9 @@ def main():
         elif "DirDelete" in cmd:
             client.send(cmd.encode(FORMAT))
 
+        elif "ChangeDir " in cmd:
+            client.send(cmd.encode(FORMAT))
+
         else:
             print("Unknown command")
             invalid_command = True
