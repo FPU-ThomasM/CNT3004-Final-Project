@@ -4,7 +4,6 @@ import json
 import hashlib #added for hashing
 from pathlib import Path
 
-
 # IP = "192.168.1.101" #"localhost"
 IP = "localhost"
 PORT = 4450
@@ -44,8 +43,6 @@ def sendFiles(conn, fileName: Path()):
     print("File sent")
     pass
 
-
-
 def authenticate(client):
     """send username + hashed password to server then wait for approval."""
     username = input("Username: ")
@@ -69,41 +66,43 @@ def authenticate(client):
         print("Authentication failed. Disconnecting.")
         return False
 
-
 def main():
+    #os.makedirs("downloadable-storage", exist_ok=True)
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client.connect(ADDR)
     client.send('hello world CNT 3004 \n'.encode())
 
     #authentication step
-    if not authenticate(client):
+    """if not authenticate(client):
         client.close()
-        return
+        return"""
 
+    invalid_command = False
     while True: ### multiple communications
-        data = client.recv(SIZE).decode(FORMAT)
-        cmd, msg = data.split("@")
-        if cmd == "OK":
-            print(f"Receiving message from the server ... ")
-            print(f"{msg}")
-        elif cmd == "DISCONNECTED":
-            print(f"{msg}")
-            break
+        if not invalid_command:
+            data = client.recv(SIZE).decode(FORMAT)
+            cmd, msg = data.split("@")
+            print("received: "+ cmd)
+            if cmd == "OK":
+                print(f"Receiving message from the server ... ")
+                print(f"{msg}")
+            elif cmd == "DISCONNECTED":
+                print(f"{msg}")
+                break
         data = input("> ")
         cmd = data
         print(cmd)
         p = Path()
-        
+        invalid_command = False
         if cmd == "TASK":
             client.send(cmd.encode(FORMAT))
             #type TASK command in the client, then try LOGOUT
         elif cmd == "LOGOUT":
             client.send(cmd.encode(FORMAT))
             break
-        
         elif cmd == "Dir":
             client.send(cmd.encode(FORMAT))
-        
+        #example
         elif "Upload " in cmd:
             client.send(cmd.encode(FORMAT))
             filePath = cmd.replace("Upload ",'',1)
@@ -119,15 +118,25 @@ def main():
                     client.send(b"NO")
             else:
                 sendFiles(client, filePath)
-            
-
-            
-
-
 
         elif "Download " in cmd:
             client.send(cmd.encode(FORMAT))
             downloadFile(client)
+
+        elif "Delete " in cmd:
+            client.send(cmd.encode(FORMAT))
+
+        elif "DirCreate" in cmd:
+            client.send(cmd.encode(FORMAT))
+
+        elif "DirDelete" in cmd:
+            client.send(cmd.encode(FORMAT))
+
+        else:
+            print("Unknown command")
+            invalid_command = True
+
+
            
 
 
