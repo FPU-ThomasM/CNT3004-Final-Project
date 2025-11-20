@@ -58,7 +58,7 @@ def authenticate(client):
 
     #wait for server response
     response = client.recv(SIZE).decode(FORMAT)
-
+    print(response)
     if response == "AUTH_OK":
         print("Authentication successful!\n")
         return True
@@ -71,11 +71,14 @@ def main():
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client.connect(ADDR)
     client.send('hello world CNT 3004 \n'.encode())
+    response = client.recv(SIZE).decode(FORMAT)
+    print(response)
+
 
     #authentication step
-    """if not authenticate(client):
+    if not authenticate(client):
         client.close()
-        return"""
+        return
 
     invalid_command = False
     while True: ### multiple communications

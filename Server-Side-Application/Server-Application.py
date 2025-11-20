@@ -101,18 +101,26 @@ def dirDelete(path):
 def handle_client (conn,addr):
     print(f"[NEW CONNECTION] {addr} connected.")
     conn.send("OK@Welcome to the CNT 3004 server - Python".encode(FORMAT))
+    ack_client = conn.recv(SIZE).decode(FORMAT)
+    print(ack_client)
 
 #authentication block
     authenticated = False
 
     while not authenticated:
         auth_data = conn.recv(SIZE).decode(FORMAT)
+        print(auth_data)
 
         if not auth_data.startswith("AUTH"):
+            print("I received: " + auth_data)
             conn.send("AUTH_FAIL".encode(FORMAT))
             continue
 
         _, username, password_hash = auth_data.split("@")
+
+        print(username)
+        print(USER_DATABASE[username])
+        print(password_hash)
 
         if username in USER_DATABASE and USER_DATABASE[username] == password_hash:
             conn.send("AUTH_OK".encode(FORMAT))
