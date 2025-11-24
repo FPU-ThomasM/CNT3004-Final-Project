@@ -130,6 +130,8 @@ def handle_client (conn,addr):
 
     while True:
         data =  conn.recv(SIZE).decode(FORMAT)
+        if not data:
+            break
         data = data.split("@")
         cmd = data[0]
         print(cmd)

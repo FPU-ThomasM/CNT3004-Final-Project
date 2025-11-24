@@ -37,7 +37,7 @@ class client_ui:
         #self.login(True)
 
 
-    def main_window(self):
+    def main_window(self, dir=None):
         self.window = ctk.CTk()
         self.window.title("CNT3004 File Server")
         self.window.geometry("800x600")
