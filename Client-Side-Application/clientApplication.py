@@ -80,7 +80,7 @@ def main():
         client.close()
         return
 
-    invalid_command = False
+    invalid_command = True
     while True: ### multiple communications
         if not invalid_command:
             data = client.recv(SIZE).decode(FORMAT)

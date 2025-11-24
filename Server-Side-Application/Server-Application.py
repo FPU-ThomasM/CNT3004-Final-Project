@@ -11,7 +11,7 @@ ADDR = (IP,PORT)
 SIZE = 1024
 FORMAT = "utf-8"
 SERVER_PATH = "server"
-currDir = "downloadable-storage" #Current directory
+CURRDIR = "downloadable-storage" #Current directory
 
 SALT = "CNT3004" #matches client
 USER_DATABASE = {
@@ -99,6 +99,8 @@ def dirDelete(path):
 
 ### to handle the clients
 def handle_client (conn,addr):
+    currDir = CURRDIR
+
     print(f"[NEW CONNECTION] {addr} connected.")
     conn.send("OK@Welcome to the CNT 3004 server - Python".encode(FORMAT))
     ack_client = conn.recv(SIZE).decode(FORMAT)
@@ -109,18 +111,12 @@ def handle_client (conn,addr):
 
     while not authenticated:
         auth_data = conn.recv(SIZE).decode(FORMAT)
-        print(auth_data)
 
         if not auth_data.startswith("AUTH"):
-            print("I received: " + auth_data)
             conn.send("AUTH_FAIL".encode(FORMAT))
             continue
 
         _, username, password_hash = auth_data.split("@")
-
-        print(username)
-        print(USER_DATABASE[username])
-        print(password_hash)
 
         if username in USER_DATABASE and USER_DATABASE[username] == password_hash:
             conn.send("AUTH_OK".encode(FORMAT))
@@ -131,7 +127,7 @@ def handle_client (conn,addr):
             print(f"[AUTH FAILED] {addr}")
             conn.close()
             return
- 
+
     while True:
         data =  conn.recv(SIZE).decode(FORMAT)
         data = data.split("@")
