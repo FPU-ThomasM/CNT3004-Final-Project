@@ -9,6 +9,10 @@ class Analysis:
   def __init__(self, role, address): #you need to define the class, figure out the role, and get the IP address for each part
     self.role = role
     self.address = address
+    self.start_time_value = None
+    self.end_time_value = None
+    self.file_size = None
+    self.stats = {}
     
   #this is a little easter egg, hi y'all!
 
@@ -17,11 +21,13 @@ class Analysis:
   #stop time - start time = total time
   #time will take in from computer's current time 
   
-  
-  def record_stats():
-    return 0 #placeholder code for me a place to start
-  
-  def save_stats():
+  def start_time():
+    self.start_time_value = time.perf_counter()
+
+    if file_path is not None and os.path.exists(file_path):
+        self.file_size = os.path.getsize(file_path)
+
+  def stop_time(): #this replaces save stats, for both server and client
     return 0 #placeholder 2
-    #this function needs to be both for the server AND client
+
 
