@@ -155,10 +155,10 @@ def handle_client (conn,addr):
         # Print list of files in the downloadable storage folder
         elif cmd == "Dir":
             folder = Path(q.parent / currDir)
-            print(f"{send_data}")
             #send_data += "LOGOUT from the server.\n"
             setofFIles = files_Set(folder)
             send_data += f"{setofFIles}\n"
+            print(f"{send_data}")
             conn.send(send_data.encode(FORMAT))
 
         elif "Upload " in cmd:
