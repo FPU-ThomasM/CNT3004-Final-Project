@@ -6,6 +6,8 @@ import json
 import hashlib #these imports are based off the other modules
 import time
 
+#Hey all y'all, imma add the comments soon
+
 class Analysis:
   def __init__(self, role, address): #you need to define the class, figure out the role, and get the IP address for each part
     self.role = role
@@ -60,6 +62,7 @@ class Analysis:
       json.dump(self.stats, f, indent=4)
 
     return json_path
+
 
 
 
