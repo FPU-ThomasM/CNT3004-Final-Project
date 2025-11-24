@@ -4,6 +4,7 @@ import threading
 from pathlib import Path
 import json
 import hashlib #these imports are based off the other modules
+import time
 
 class Analysis:
   def __init__(self, role, address): #you need to define the class, figure out the role, and get the IP address for each part
@@ -21,14 +22,14 @@ class Analysis:
   #stop time - start time = total time
   #time will take in from computer's current time 
   
-  def start_time():
+  def start_time(self, file_path=None):
     self.start_time_value = time.perf_counter()
 
     if file_path is not None and os.path.exists(file_path):
       self.file_size = os.path.getsize(file_path)
     return self.start_time_value
 
-  def stop_time(): #this replaces save stats, for both server and client
+  def stop_time(self): #this replaces save stats, for both server and client
     self.end_time_value = time.perf_counter()
 
     if self.start_time_value is None:
@@ -49,7 +50,7 @@ class Analysis:
 
     return self.stats
 
-  def save_stats(self, filename="analysis_results.json")
+  def save_stats(self, filename="analysis_results.json"):
     results_path = Path("results")
     results_path.mkdir(exist_ok=True)
 
@@ -59,6 +60,7 @@ class Analysis:
       json.dump(self.stats, f, indent=4)
 
     return json_path
+
 
 
 
