@@ -26,8 +26,18 @@ class Analysis:
 
     if file_path is not None and os.path.exists(file_path):
         self.file_size = os.path.getsize(file_path)
+    return self.start_time_value
 
   def stop_time(): #this replaces save stats, for both server and client
-    return 0 #placeholder 2
+    self.end_time_value = time.perf_counter()
+
+    if self.start_time_value is None:
+        raise ValueError("start_time() must be called before stop_time().")
+
+    total_time = self.end_time_value - self.start_time_value
+
+    transmission_rate = self.file_size / total_time
+
+
 
 
