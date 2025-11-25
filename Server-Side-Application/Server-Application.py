@@ -45,10 +45,10 @@ def sendFiles(conn, fileName: Path()):
     conn.send(b"END")
     print("File sent")
 
-def downloadFile(client):
+def downloadFile(client, curr_dir):
     """Recieve file from client and save"""
     #Set the files name so that it will be saved in current directory
-    folderPath = Path(currDir)
+    folderPath = Path(curr_dir)
     savedName = client.recv(SIZE).decode(FORMAT)
     savedNamePath = Path(savedName)
     savedNamePath = Path(folderPath / savedNamePath.name)
@@ -99,7 +99,7 @@ def dirDelete(path):
 
 ### to handle the clients
 def handle_client (conn,addr):
-    currDir = CURRDIR
+    curr_dir = CURRDIR
 
     print(f"[NEW CONNECTION] {addr} connected.")
     conn.send("OK@Welcome to the CNT 3004 server - Python".encode(FORMAT))
@@ -154,7 +154,7 @@ def handle_client (conn,addr):
         
         # Print list of files in the downloadable storage folder
         elif cmd == "Dir":
-            folder = Path(q.parent / currDir)
+            folder = Path(q.parent / curr_dir)
             #send_data += "LOGOUT from the server.\n"
             setofFIles = files_Set(folder)
             send_data += f"{setofFIles}\n"
@@ -162,7 +162,7 @@ def handle_client (conn,addr):
             conn.send(send_data.encode(FORMAT))
 
         elif "Upload " in cmd:
-            downloadFile(conn)
+            downloadFile(conn, curr_dir)
             send_data += "Message from the server.\n"
             conn.send(send_data.encode(FORMAT))
             print("Completed task")
@@ -171,7 +171,7 @@ def handle_client (conn,addr):
             fileName = cmd.replace("Download ",'',1)
             print("Recieved")
             try:
-                fileNamePath = Path(q.parent / f"{currDir}/{fileName}")
+                fileNamePath = Path(q.parent / f"{curr_dir}/{fileName}")
             except FileNotFoundError as e:
                 print("Error: File Not Found")
                 send_data += "Error: File Not Found"
@@ -184,7 +184,7 @@ def handle_client (conn,addr):
 
         elif "DirCreate" in cmd:
             dirName = cmd.replace("DirCreate ",'',1)
-            path = Path(q.parent / f"{currDir}/{dirName}")
+            path = Path(q.parent / f"{curr_dir}/{dirName}")
             try:
                 path.mkdir(exist_ok = False, parents = True)
                 send_data += f"Directory /{dirName} Created\n"
@@ -194,7 +194,7 @@ def handle_client (conn,addr):
 
         elif "DirDelete" in cmd:
             dirName = cmd.replace("DirDelete ",'',1)
-            path = Path(q.parent / f"{currDir}/{dirName}")
+            path = Path(q.parent / f"{curr_dir}/{dirName}")
             if not path.exists():
                 send_data += "path does not exist\n"
             elif not path.is_dir():
@@ -209,18 +209,32 @@ def handle_client (conn,addr):
 
         #Change the current Directory
         elif "ChangeDir " in cmd:
-            newDir = cmd.replace("ChangeDir ",'',1)
-            newDirPath = Path(newDir)
-            if newDirPath.is_dir(): #Check if the user specified directory exists
-                currDir = newDir
-                send_data += f"Changed directory to {currDir}\n"
+            new_dir = cmd.replace("ChangeDir ",'',1)
+            path_parts = new_dir.split("/")
+            i = 0
+            length = len(path_parts)
+            while i < length:
+                if path_parts[i] == "..":
+                    path_parts.pop(i)
+                    length -= 1
+                    if i != 0:
+                        path_parts.pop(i - 1)
+                        length -= 1
+                    continue
+                i += 1
+
+            new_dir =  f"{CURRDIR}/{"/".join(path_parts)}/"
+            new_dir_path = Path(new_dir)
+            if new_dir_path.is_dir(): #Check if the user specified directory exists
+                curr_dir = new_dir
+                send_data += f"Changed directory to {curr_dir[curr_dir.index('/') + 1:]}\n"
             else:
                 send_data += "Directory does not exist\n"
             conn.send(send_data.encode(FORMAT))
 
         elif "Delete " in cmd:
             fileName = cmd.replace("Delete ",'',1)
-            file_path = Path(q.parent / f"{currDir}/{fileName}")
+            file_path = Path(q.parent / f"{curr_dir}/{fileName}")
             if file_path.exists():
                 try:
                     file_path.unlink()

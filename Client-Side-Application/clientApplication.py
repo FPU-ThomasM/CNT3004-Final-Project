@@ -113,7 +113,9 @@ def main():
             print(filePath.name)
             client.send(filePath.name.encode(FORMAT))
             if client.recv(SIZE).decode(FORMAT) == "Error":
-                response = input("File already exists, should it be replaced (y/n): ")
+                #needed to be in its own line for ui compatibility
+                print("File already exists, should it be replaced (y/n): ")
+                response = input()
                 if response.lower() == 'y':
                     client.send(b"OK")
                     sendFiles(client, filePath)
