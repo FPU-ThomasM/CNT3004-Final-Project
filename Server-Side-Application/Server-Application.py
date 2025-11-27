@@ -129,6 +129,7 @@ def handle_client (conn,addr):
             return
 
     while True:
+        #While loo[ that lets the client execute commands
         data =  conn.recv(SIZE).decode(FORMAT)
         if not data:
             break
@@ -140,9 +141,8 @@ def handle_client (conn,addr):
        
         send_data = "OK@"
 
-        
-
         if cmd == "LOGOUT":
+            #STOP this session with clinet
             break
 
         elif cmd == "TASK":
@@ -162,12 +162,14 @@ def handle_client (conn,addr):
             conn.send(send_data.encode(FORMAT))
 
         elif "Upload " in cmd:
+            #upload a file, TO CLIENT
             downloadFile(conn, curr_dir)
             send_data += "Message from the server.\n"
             conn.send(send_data.encode(FORMAT))
             print("Completed task")
 
         elif "Download " in cmd:
+            #download the file specified, FROM CLIENT
             fileName = cmd.replace("Download ",'',1)
             print("Recieved")
             try:
@@ -183,6 +185,7 @@ def handle_client (conn,addr):
                 print("Completed task")
 
         elif "DirCreate" in cmd:
+            #dattempt to create the dir with the name given
             dirName = cmd.replace("DirCreate ",'',1)
             path = Path(q.parent / f"{curr_dir}/{dirName}")
             try:
@@ -193,6 +196,7 @@ def handle_client (conn,addr):
             conn.send(send_data.encode(FORMAT))
 
         elif "DirDelete" in cmd:
+            #attempte to delete the dir in question
             dirName = cmd.replace("DirDelete ",'',1)
             path = Path(q.parent / f"{curr_dir}/{dirName}")
             if not path.exists():

@@ -478,7 +478,7 @@ class client_ui:
             self.window.quit()
             self.window.destroy()
 
-    def ask_name_popup(self, title, promptz):
+    def ask_name_popup(self, title, prompt):
         #popu up asking the user to enter the name of the new directory
         ask_name = ctk.CTkToplevel()
         ask_name.title(title)
