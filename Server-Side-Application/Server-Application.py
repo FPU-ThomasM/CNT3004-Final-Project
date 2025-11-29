@@ -227,7 +227,7 @@ def handle_client (conn,addr):
                     continue
                 i += 1
 
-            new_dir =  f"{CURRDIR}/{"/".join(path_parts)}/"
+            new_dir =  f"{CURRDIR}/{'/'.join(path_parts)}/"
             new_dir_path = Path(new_dir)
             if new_dir_path.is_dir(): #Check if the user specified directory exists
                 curr_dir = new_dir
