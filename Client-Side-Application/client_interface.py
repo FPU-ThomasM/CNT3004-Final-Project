@@ -16,7 +16,7 @@ class ClientCmd:
 
     def login(self, username, password):
         #open the client application and attempt to login
-        self.p = subprocess.Popen(["python clientApplication.py"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True)
+        self.p = subprocess.Popen(["python", "clientApplication.py"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT , text=True)
         if not "OK@Welcome" in self.p.stdout.readline():
             self.p.kill()
             self.p = None
