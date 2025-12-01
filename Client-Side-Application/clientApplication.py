@@ -8,7 +8,7 @@ from pathlib import Path
 IP = "localhost"
 PORT = 4450
 ADDR = (IP,PORT)
-SIZE = 1024 ## byte .. buffer size
+SIZE = 65536 ## byte .. buffer size
 FORMAT = "utf-8"
 SERVER_DATA_PATH = "server_data"
 
