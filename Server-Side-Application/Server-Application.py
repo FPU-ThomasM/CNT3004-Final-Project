@@ -8,7 +8,7 @@ import hashlib #added for authentication
 IP = "localhost"
 PORT = 4450
 ADDR = (IP,PORT)
-SIZE = 1024
+SIZE = 65536
 FORMAT = "utf-8"
 SERVER_PATH = "server"
 CURRDIR = "downloadable-storage" #Current directory
