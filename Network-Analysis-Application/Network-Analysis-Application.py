@@ -7,6 +7,8 @@ import hashlib #these imports are based off the other modules
 import time
 
 #Hey all y'all, imma add the comments soon
+SIZE = 65536 ## byte .. buffer size
+
 
 class Analysis:
   def __init__(self, role, address): #you need to define the class, figure out the role, and get the IP address for each part
@@ -47,7 +49,7 @@ class Analysis:
       "file_size_bytes": self.file_size,
       "total_time_seconds": round(total_time, 4),
       "transmission_rate_bps": round(transmission_rate, 2) if transmission_rate else None,
-      "transmission_rate_mbps": round((transmission_rate / (1024 * 1024)), 4) if transmission_rate else None
+      "transmission_rate_mbps": round((transmission_rate / (SIZE * SIZE)), 4) if transmission_rate else None
     }
 
     return self.stats
@@ -62,6 +64,7 @@ class Analysis:
       json.dump(self.stats, f, indent=4)
 
     return json_path
+
 
 
 
