@@ -9,20 +9,14 @@ import time
 SIZE = 65536 ## byte .. buffer size
 
 class Analysis:
-  def __init__(self, role, address): #you need to define the class, figure out the role, and get the IP address for each part
+  def __init__(self, role, address): #initialization
     self.role = role
     self.address = address
     self.start_time_value = None
     self.end_time_value = None
     self.file_size = None
     self.stats = {}
-    
-  #this is a little easter egg, hi y'all!
 
-  #Need a start time and a stop time function (replace record)
-  #calculate transmission rate when stop time is called
-  #stop time - start time = total time
-  #time will take in from computer's current time 
   
   def start_time(self, file_path=None):
     self.start_time_value = time.perf_counter()
@@ -31,10 +25,10 @@ class Analysis:
       self.file_size = os.path.getsize(file_path)
     return self.start_time_value
 
-  def stop_time(self): #for both server and client
+  def stop_time(self):
     self.end_time_value = time.perf_counter()
 
-    if self.start_time_value is None: #maybe I remove this, don't want to crash the program with this module. worse that can happen is that things don't save
+    if self.start_time_value is None:
       raise ValueError("start_time() must be called before stop_time().")
 
     total_time = self.end_time_value - self.start_time_value
@@ -64,6 +58,7 @@ class Analysis:
       json.dump(self.stats, f, indent=4)
 
     return json_path
+
 
 
 
