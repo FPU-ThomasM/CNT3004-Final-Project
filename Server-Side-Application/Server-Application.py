@@ -67,12 +67,12 @@ def downloadFile(client, curr_dir):
     try: #Check if the file already exists in the server
         #Network Analysis Section
         analyzer = Analysis(role="Server_Receive", address=IP)
-
+        bytes_received = 0
      
         #If not, make the new file
         with open(f"{savedNamePath}", 'xb') as file:
             analyzer.start_time(savedNamePath)
-            bytes_received = 0
+
             client.send(b"OK")
             while True:
                 print("Receiving...")

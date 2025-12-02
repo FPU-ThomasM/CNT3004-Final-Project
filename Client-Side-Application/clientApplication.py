@@ -20,11 +20,11 @@ def downloadFile(client):
 
     #Network Analysis Application
     analyzer = Analysis(role="Client_Download", address=IP)
-    analyzer.start_time()
     bytes_received = 0
     
     savedName = client.recv(SIZE).decode(FORMAT)
     with open(f"{savedName}", 'wb') as file:
+        analyzer.start_time(savedName)
         while True:
             print("Receiving...")
             data = client.recv(SIZE)
