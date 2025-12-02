@@ -4,6 +4,7 @@ import threading
 from pathlib import Path
 import json
 import hashlib #added for authentication
+import Network_Analysis_Application import Analysis
  
 IP = "localhost"
 PORT = 4450
@@ -31,6 +32,11 @@ def files_Set(directory):
 
 def sendFiles(conn, fileName: Path()):
     """Send file to client"""
+
+    #Analysis Module Added
+    analyzer = Analysis(role="Server_Send", address=IP)
+    analyzer.start_time(file_path=fileName)
+ 
     print(fileName)
     name = fileName.name
     conn.send(name.encode(FORMAT))
@@ -45,6 +51,10 @@ def sendFiles(conn, fileName: Path()):
     conn.send(b"END")
     print("File sent")
 
+    #Network Analysis addition
+    analyzer.stop_time()
+    analyzer.save_stats(filename=f"server_send_{fileName.name}_stats.json")
+ 
 def downloadFile(client, curr_dir):
     """Recieve file from client and save"""
     #Set the files name so that it will be saved in current directory
@@ -55,6 +65,11 @@ def downloadFile(client, curr_dir):
     print(savedNamePath)
     
     try: #Check if the file already exists in the server
+        #Network Analysis Section
+        analyzer = Analysis(role="Server_Receive", address=IP)
+        analyzer.start_time()
+        bytes_received = 0
+     
         #If not, make the new file
         with open(f"{savedNamePath}", 'xb') as file:
             client.send(b"OK")
@@ -66,8 +81,22 @@ def downloadFile(client, curr_dir):
                     break
                 file.write(data)
                 #Like this doesn't need to say anything lol just exists to make sure b"END" is sent as its own lol
+                bytes_received += len(data)
                 client.send("NEXT".encode(FORMAT))       
         print("completed task")
+
+        #Network Analysis Section
+        stats = analyzer.stop_time()
+        if stats and ('file_size_bytes' not in stats or stats['file_size_bytes'] is None):
+            total_time = stats['total_time_seconds']
+            stats['file_size_bytes'] = bytes_received
+            if total_time > 0 and bytes_received > 0:
+                transmission_rate = bytes_received / total_time
+                stats['transmission_rate_bps'] = round(transmission_rate, 2)
+                stats['transmission_rate_mbps'] = round((transmission_rate / (SIZE * SIZE)), 4)
+            analyzer.stats = stats
+
+        analyzer.save_stats(filename=f"server_receive_{savedNamePath.name}_stats.json")
 
     except FileExistsError as e: #If yes, check if the user wants to replace the old one with the new one
         client.send("Error".encode(FORMAT))
@@ -75,6 +104,11 @@ def downloadFile(client, curr_dir):
         response = client.recv(SIZE)
         print(response)
         if response == b"OK": #If the user wants to replace the file, replace it
+
+            analyzer = Analysis(role="Server_Receive_Overwrite", address=IP) #Network Analysis Section
+            analyzer.start_time()
+            bytes_received = 0
+            
             with open(f"{savedNamePath}", 'wb') as file:
                 while True:
                     print("Receiving...")
@@ -83,9 +117,23 @@ def downloadFile(client, curr_dir):
                     if data == b"END":
                         break
                     file.write(data)
+                    bytes_received += len(data) #Network Analysis Section
                     client.send("NEXT".encode(FORMAT))
                     
             print("downloaded files")
+
+            #Network Analysis Section
+            stats = analyzer.stop_time()
+            if stats and ('file_size_bytes' not in stats or stats['file_size_bytes'] is None):
+                total_time = stats['total_time_seconds']
+                stats['file_size_bytes'] = bytes_received
+                if total_time > 0 and bytes_received > 0:
+                    transmission_rate = bytes_received / total_time
+                    stats['transmission_rate_bps'] = round(transmission_rate, 2)
+                    stats['transmission_rate_mbps'] = round((transmission_rate / (SIZE * SIZE)), 4)
+                analyzer.stats = stats
+
+            analyzer.save_stats(filename=f"server_receive_{savedNamePath.name}_overwrite_stats.json")
     pass
 
 def dirDelete(path):
