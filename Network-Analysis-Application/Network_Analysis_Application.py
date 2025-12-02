@@ -21,12 +21,15 @@ class Analysis:
   def start_time(self, file_path=None):
     self.start_time_value = time.perf_counter()
 
-    if file_path is not None and os.path.exists(file_path):
-      self.file_size = os.path.getsize(file_path)
+    #if file_path is not None and os.path.exists(file_path):
+    #  self.file_size = os.path.getsize(file_path)
     return self.start_time_value
 
-  def stop_time(self):
+  def stop_time(self, file_path=None):
     self.end_time_value = time.perf_counter()
+
+    if file_path is not None and os.path.exists(file_path):
+      self.file_size = os.path.getsize(file_path)
 
     if self.start_time_value is None:
       raise ValueError("start_time() must be called before stop_time().")
@@ -58,6 +61,7 @@ class Analysis:
       json.dump(self.stats, f, indent=4)
 
     return json_path
+
 
 
 
