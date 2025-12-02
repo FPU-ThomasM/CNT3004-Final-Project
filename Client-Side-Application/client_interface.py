@@ -271,7 +271,7 @@ class client_ui:
 
         dir_name = self.client_cmd.current_dir_name()
         if dir_name == "":
-            dir_name = "downloadable-storage/"
+            dir_name = "../Server-Side-Application/downloadable-storage/"
         else:
             dir_name = "downloadable-storage" + dir_name
 

@@ -1,9 +1,11 @@
-import os
 import socket
-import json
 import hashlib #added for hashing
 from pathlib import Path
-from Network_Analysis_Application import Analysis
+import sys
+import sys
+sys.path.insert(1, "../Network-Analysis-Application")
+from Network_Analysis_Application import *
+
 
 # IP = "192.168.1.101" #"localhost"
 IP = "localhost"

@@ -1,11 +1,11 @@
-import os
 import socket
 import threading
 from pathlib import Path
-import json
 import hashlib #added for authentication
-import Network_Analysis_Application import Analysis
- 
+import sys
+sys.path.insert(1, "../Network-Analysis-Application")
+from Network_Analysis_Application import *
+
 IP = "localhost"
 PORT = 4450
 ADDR = (IP,PORT)
@@ -67,11 +67,12 @@ def downloadFile(client, curr_dir):
     try: #Check if the file already exists in the server
         #Network Analysis Section
         analyzer = Analysis(role="Server_Receive", address=IP)
-        analyzer.start_time()
-        bytes_received = 0
+
      
         #If not, make the new file
         with open(f"{savedNamePath}", 'xb') as file:
+            analyzer.start_time(savedNamePath)
+            bytes_received = 0
             client.send(b"OK")
             while True:
                 print("Receiving...")
