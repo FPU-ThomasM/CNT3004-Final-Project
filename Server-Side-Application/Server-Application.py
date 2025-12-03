@@ -35,7 +35,7 @@ def sendFiles(conn, fileName: Path()):
 
     #Analysis Module Added
     analyzer = Analysis(role="Server_Send", address=IP)
-    analyzer.start_time(file_path=fileName)
+    analyzer.start_time()
  
     print(fileName)
     name = fileName.name
@@ -52,7 +52,7 @@ def sendFiles(conn, fileName: Path()):
     print("File sent")
 
     #Network Analysis addition
-    analyzer.stop_time()
+    analyzer.stop_time(file_path=fileName)
     analyzer.save_stats(filename=f"server_send_{fileName.name}_stats.json")
  
 def downloadFile(client, curr_dir):
@@ -71,7 +71,7 @@ def downloadFile(client, curr_dir):
      
         #If not, make the new file
         with open(f"{savedNamePath}", 'xb') as file:
-            analyzer.start_time(savedNamePath)
+            analyzer.start_time()
 
             client.send(b"OK")
             while True:
@@ -87,7 +87,7 @@ def downloadFile(client, curr_dir):
         print("completed task")
 
         #Network Analysis Section
-        stats = analyzer.stop_time()
+        stats = analyzer.stop_time(savedNamePath)
         if stats and ('file_size_bytes' not in stats or stats['file_size_bytes'] is None):
             total_time = stats['total_time_seconds']
             stats['file_size_bytes'] = bytes_received
