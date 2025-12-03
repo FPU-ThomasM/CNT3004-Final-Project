@@ -24,7 +24,7 @@ def downloadFile(client):
     
     savedName = client.recv(SIZE).decode(FORMAT)
     with open(f"{savedName}", 'wb') as file:
-        analyzer.start_time(savedName)
+        analyzer.start_time()
         while True:
             print("Receiving...")
             data = client.recv(SIZE)
@@ -36,7 +36,7 @@ def downloadFile(client):
             client.send("NEXT".encode(FORMAT))
                     
     print("completed task")
-    stats = analyzer.stop_time() #network analysis section
+    stats = analyzer.stop_time(savedName) #network analysis section
 
     if stats and ('file_size_bytes' not in stats or stats['file_size_bytes'] is None):
         total_time = stats['total_time_seconds']
@@ -57,7 +57,7 @@ def sendFiles(conn, fileName: Path()):
 
     #Network Analysis Application
     analyzer = Analysis(role="Client_Upload", address=IP)
-    analyzer.start_time(file_path=fileName)
+    analyzer.start_time()
     
     with open(fileName, 'rb') as file:
         while True:
@@ -72,7 +72,7 @@ def sendFiles(conn, fileName: Path()):
     print("File sent")
     
     #Network Analysis Section
-    analyzer.stop_time()
+    analyzer.stop_time(file_path=fileName)
     analyzer.save_stats(filename=f"client_upload_{fileName.name}_stats.json")
     
     pass
