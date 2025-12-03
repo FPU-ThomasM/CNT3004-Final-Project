@@ -18,11 +18,9 @@ class Analysis:
     self.stats = {}
 
   
-  def start_time(self, file_path=None):
+  def start_time(self):
     self.start_time_value = time.perf_counter()
 
-    #if file_path is not None and os.path.exists(file_path):
-    #  self.file_size = os.path.getsize(file_path)
     return self.start_time_value
 
   def stop_time(self, file_path=None):
@@ -61,6 +59,7 @@ class Analysis:
       json.dump(self.stats, f, indent=4)
 
     return json_path
+
 
 
 
