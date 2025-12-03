@@ -41,8 +41,8 @@ class Analysis:
       "ip_address": self.address,
       "file_size_bytes": self.file_size,
       "total_time_seconds": round(total_time, 4),
-      "transmission_rate_bps": round(transmission_rate, 2) if transmission_rate else None,
-      "transmission_rate_mbps": round((transmission_rate / (SIZE * SIZE)), 4) if transmission_rate else None
+      "transmission_rate_Bps": round(transmission_rate, 2) if transmission_rate else None,
+      "transmission_rate_MBps": round((transmission_rate / (1024 * 1024)), 4) if transmission_rate else None
     }
     
     return self.stats
